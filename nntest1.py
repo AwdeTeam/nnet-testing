@@ -1,21 +1,20 @@
+print "Importing stuffs..."
+
 import theano
 import theano.tensor as t
+import numpy
 import numpy.random as rng # random number generator
 
 #rng.permutation(3) # random generator for hidden layer values
 
 # ----- theano stuff! -----
 
+print "Compiling stuffs..."
 
-# inputs
-inputs = t.dmatrix('inputs')
-
-# first layer weights
-weights1 = t.dmatrix('weights1')
-
-# hidden layer outputs
-out1 = numpy.dot(inputs*weights1)
-
+# first theano matrices
+inputs = t.dmatrix('inputs') # inputs
+weights1 = t.dmatrix('weights1') # first layer weights
+out1 = t.dot(inputs, weights1) # hidden layer outputs
 
 # first layer function
 f1 = theano.function([inputs,weights1], out1)
@@ -24,7 +23,7 @@ f1 = theano.function([inputs,weights1], out1)
 weights2 = t.dmatrix('weights2')
 
 # end result outputs
-outputs = numpy.dot(out1*weights2)
+outputs = t.dot(out1, weights2)
 
 # end result calculator function
 f2 = theano.function([out1,weights2], outputs)
@@ -32,6 +31,8 @@ f2 = theano.function([out1,weights2], outputs)
 
 
 # ----- execution stuff! -----
+
+print "Executing stuffs!"
 
 # matricies!
 mat_input = numpy.asarray([[10,5]])
