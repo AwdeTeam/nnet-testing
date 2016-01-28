@@ -14,7 +14,9 @@ print "Compiling stuffs..."
 # first theano matrices
 inputs = t.dmatrix('inputs') # inputs
 weights1 = t.dmatrix('weights1') # first layer weights
-out1 = t.dot(inputs, weights1) # hidden layer outputs
+presig1 = t.dot(inputs, weights1) # outputs before sigmoid
+# out1 = t.dot(inputs, weights1) # hidden layer outputs
+out1 = 1 / (1 + t.exp(-presig1))
 
 # first layer function
 f1 = theano.function([inputs,weights1], out1)
@@ -23,7 +25,9 @@ f1 = theano.function([inputs,weights1], out1)
 weights2 = t.dmatrix('weights2')
 
 # end result outputs
-outputs = t.dot(out1, weights2)
+presig2 = t.dot(out1, weights2) # outputs before sigmoid
+# outputs = t.dot(out1, weights2)
+outputs = 1 / (1 + t.exp(-presig2))
 
 # end result calculator function
 f2 = theano.function([out1,weights2], outputs)
@@ -35,15 +39,17 @@ f2 = theano.function([out1,weights2], outputs)
 print "Executing stuffs!"
 
 # matricies!
-mat_input = numpy.asarray([[10,5]])
+mat_input = numpy.asarray([[10,-5]])
 mat_weights1 = numpy.asarray([
 	[5,3,7],
 	[4,5,4]])
 mat_weights2 = numpy.asarray([
 	[-2],
 	[7],
-	[-5]])
+	[-3]])
 
 mat_hiddenLayer = f1(mat_input,mat_weights1)
+print mat_hiddenLayer # DEBUG
 finalLayer = f2(mat_hiddenLayer, mat_weights2)
+print "-----final----- " 
 print finalLayer
