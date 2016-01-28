@@ -36,20 +36,28 @@ f2 = theano.function([out1,weights2], outputs)
 
 # ----- execution stuff! -----
 
+def feedForward(mat_input, mat_weights1, mat_weights2):
+	mat_hiddenLayer = f1(mat_input, mat_weights1)
+	finalLayer = f2(mat_hiddenLayer, mat_weights2)
+	return finalLayer
+
 print "Executing stuffs!"
 
 # matricies!
-mat_input = numpy.asarray([[10,-5]])
-mat_weights1 = numpy.asarray([
+lmat_input = numpy.asarray([[10,-5]])
+lmat_weights1 = numpy.asarray([
 	[5,3,7],
 	[4,5,4]])
-mat_weights2 = numpy.asarray([
+lmat_weights2 = numpy.asarray([
 	[-2],
 	[7],
 	[-3]])
 
-mat_hiddenLayer = f1(mat_input,mat_weights1)
-print mat_hiddenLayer # DEBUG
-finalLayer = f2(mat_hiddenLayer, mat_weights2)
-print "-----final----- " 
-print finalLayer
+#mat_hiddenLayer = f1(mat_input,mat_weights1)
+# print mat_hiddenLayer # DEBUG
+#finalLayer = f2(mat_hiddenLayer, mat_weights2)
+# print "-----final----- " 
+#print finalLayer
+
+result = feedForward(lmat_input, lmat_weights1, lmat_weights2)
+print result
