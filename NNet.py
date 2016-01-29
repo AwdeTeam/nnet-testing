@@ -11,15 +11,17 @@ class NeuralNetwork():
 	# member variables
 	trainingInputs = []
 	trainingOutputs = []
+	weights = []
 
 	inputs = 0
 	layers = 0
+	layerNueronCount = 0
 	outputs = 0
 	
 
 	# construction
-	def __init__(self,inpNum,hiddenLayerNum,outNum):
-		print "Being initialized: " + str(inpNum) + " inputs " + str(hiddenLayerNum) + " hidden layers " + str(outNum) + " outputs"
+	def __init__(self,inpNum,hiddenLayerNum,hiddenLayerNeurons,outNum):
+		print "Network shape initialized: " + str(inpNum) + " inputs, " + str(hiddenLayerNum) + " hidden layers, " + str(hiddenLayerNeurons) + " neurons per hidden layer, " + str(outNum) + " outputs"
 		self.inputs = inpNum
 		self.layers = hiddenLayerNum
 		self.outputs = outNum
@@ -58,5 +60,10 @@ class NeuralNetwork():
 				outputArray = numpy.concatenate((outputArray, [[csv[i]]]), 1)
 			self.trainingOutputs.append(outputArray)	
 			
-		print self.trainingInputs
-		print self.trainingOutputs
+		# print self.trainingInputs
+		# print self.trainingOutputs
+
+	def generateWeights(self):
+		for i in range(0,self.layers + 1):
+			
+	
