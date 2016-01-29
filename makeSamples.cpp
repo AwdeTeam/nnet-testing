@@ -23,8 +23,8 @@ int main()
 		//cout << "out: " << t << ".0" << endl;
 		//cout << n1 << ".0," << n2 << ".0" << endl;
 		//cout << t << ".0" << endl;
-		fileStream << n1 << ".0," << n2 << ".0" << endl;
-		fileStream << t << ".0" << endl;
+		fileStream << n1 << ".0," << n2 << ".0," << t << ".0" << endl; // in1,in2,out
+		//fileStream << t << ".0" << endl;
 	}
 
 	fileStream.close();

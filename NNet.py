@@ -9,11 +9,20 @@ print "(Imports complete!)"
 class NeuralNetwork():
 	
 	# member variables
+	trainingInputs = []
+	trainingOutputs = []
+
+	inputs = 0
+	layers = 0
+	outputs = 0
 	
 
 	# construction
 	def __init__(self,inpNum,hiddenLayerNum,outNum):
 		print "Being initialized: " + str(inpNum) + " inputs " + str(hiddenLayerNum) + " hidden layers " + str(outNum) + " outputs"
+		self.inputs = inpNum
+		self.layers = hiddenLayerNum
+		self.outputs = outNum
 		
 
 	# setup and compile the necessary theano functions
@@ -30,7 +39,24 @@ class NeuralNetwork():
 
 		print "(Functions ready!)"
 
+
+	# expects csv file
 	def readTrainingData(self, fileName):
 		lines = [line.strip() for line in open(fileName)]
 		for line in lines:
-			print "thing: " + line
+			csv = line.split(",")
+
+			# get training inputs
+			inputArray = numpy.asarray([[]])
+			for i in range(0,self.inputs):
+				inputArray = numpy.concatenate((inputArray, [[csv[i]]]), 1) # 1 specifies axis (adds col, not row)
+			self.trainingInputs.append(inputArray)
+
+			# get training outputs
+			outputArray = numpy.asarray([[]])
+			for i in range(0 + self.inputs, self.inputs + self.outputs):
+				outputArray = numpy.concatenate((outputArray, [[csv[i]]]), 1)
+			self.trainingOutputs.append(outputArray)	
+			
+		print self.trainingInputs
+		print self.trainingOutputs
