@@ -5,6 +5,7 @@ import numpy
 print "(Imports complete!)"
 
 # NOTE: For now, weights will be randomly initialized
+#I changed something!
 
 class NeuralNetwork():
 	
