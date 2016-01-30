@@ -19,7 +19,6 @@ class NeuralNetwork():
 	layerNeuronCount = 0
 	outputs = 0
 	
-
 	# construction
 	def __init__(self,inpNum,hiddenLayerNum,hiddenLayerNeurons,outNum):
 		print "Network shape initialized: " + str(inpNum) + " inputs, " + str(hiddenLayerNum) + " hidden layers, " + str(hiddenLayerNeurons) + " neurons per hidden layer, " + str(outNum) + " outputs"
@@ -43,7 +42,6 @@ class NeuralNetwork():
 
 		print "(Functions ready!)"
 
-
 	# expects csv file
 	def readTrainingData(self, fileName):
 		lines = [line.strip() for line in open(fileName)]
@@ -53,13 +51,15 @@ class NeuralNetwork():
 			# get training inputs
 			inputArray = numpy.asarray([[]])
 			for i in range(0,self.inputs):
-				inputArray = numpy.concatenate((inputArray, [[csv[i]]]), 1) # 1 specifies axis (adds col, not row)
+				value = float(csv[i])
+				inputArray = numpy.concatenate((inputArray, [[value]]), 1) # 1 specifies axis (adds col, not row)
 			self.trainingInputs.append(inputArray)
 
 			# get training outputs
 			outputArray = numpy.asarray([[]])
 			for i in range(0 + self.inputs, self.inputs + self.outputs):
-				outputArray = numpy.concatenate((outputArray, [[csv[i]]]), 1)
+				value = float(csv[i])
+				outputArray = numpy.concatenate((outputArray, [[value]]), 1)
 			self.trainingOutputs.append(outputArray)	
 			
 		# print self.trainingInputs
@@ -82,3 +82,37 @@ class NeuralNetwork():
 
 		for i in range(0, len(self.weights)):
 			print self.weights[i]
+
+	def runFeedForward(self):
+		# run first feedforward
+		#self.feedForward([trainingInputs, weights[0]
+
+		#for i in range(0, len(self.trainingInputs)):
+			#print self.trainingInputs[i]
+			
+
+		#currentIn = trainingInputs
+		currentIn = self.trainingInputs[0]
+		#print currentIn
+		#outthing = self.feedForward(currentIn, self.weights[0])
+		#outthing = self.feedForward([[10,5]], self.weights[0])
+		#print outthing
+
+		# input and hidden layers
+		#for i in range(0, self.layers - 2):
+		print "---------"
+		for i in range(0, len(self.weights)-1):
+			currentWeights = self.weights[i]
+			currentIn = self.feedForward(currentIn, currentWeights)
+			print currentIn
+
+		# final layer
+		#output = self.feedForward(currentIn, self.weights[self.layers - 1])
+		
+		
+		output = self.feedForward(currentIn, self.weights[len(self.weights) - 1])
+		
+		
+		#output = self.feedForward(currentIn, self.weights[0])
+		print "---------"
+		print output
