@@ -15,7 +15,7 @@ class NeuralNetwork():
 
 	inputs = 0
 	layers = 0
-	layerNueronCount = 0
+	layerNeuronCount = 0
 	outputs = 0
 	
 
@@ -24,6 +24,7 @@ class NeuralNetwork():
 		print "Network shape initialized: " + str(inpNum) + " inputs, " + str(hiddenLayerNum) + " hidden layers, " + str(hiddenLayerNeurons) + " neurons per hidden layer, " + str(outNum) + " outputs"
 		self.inputs = inpNum
 		self.layers = hiddenLayerNum
+		self.layerNeuronCount = hiddenLayerNeurons
 		self.outputs = outNum
 		
 
@@ -65,6 +66,18 @@ class NeuralNetwork():
 
 	# TODO: one input to hidden matrix, (amount) hidden to hidden, hidden to out matrix
 	def generateWeights(self):
-		for i in range(0,self.layers): # input
-			
-	
+		
+		# input to first hidden layer (inputs x hiddenLayerNodes)
+		weights_in_hidden = numpy.random.rand(self.inputs, self.layerNeuronCount)
+		self.weights.append(weights_in_hidden)
+		
+		for i in range(0,self.layers - 1): # input
+			weights_hidden_hidden = numpy.random.rand(self.layerNeuronCount, self.layerNeuronCount)
+			self.weights.append(weights_hidden_hidden)
+
+		# final hidden to output layer (hiddenLayerNodes x outputs)
+		weights_hidden_out = numpy.random.rand(self.layerNeuronCount, self.outputs)
+		self.weights.append(weights_hidden_out)
+
+		for i in range(0, len(self.weights)):
+			print self.weights[i]
