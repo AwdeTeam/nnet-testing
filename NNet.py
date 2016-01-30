@@ -98,11 +98,20 @@ class NeuralNetwork():
 		#print outthing
 
 		# input and hidden layers
-		for i in range(0, self.layers - 2):
+		#for i in range(0, self.layers - 2):
+		print "---------"
+		for i in range(0, len(self.weights)-1):
 			currentWeights = self.weights[i]
 			currentIn = self.feedForward(currentIn, currentWeights)
+			print currentIn
 
 		# final layer
-		output = self.feedForward(currentIn, self.weights[self.layers - 1])
+		#output = self.feedForward(currentIn, self.weights[self.layers - 1])
+		
+		
+		output = self.feedForward(currentIn, self.weights[len(self.weights) - 1])
+		
+		
 		#output = self.feedForward(currentIn, self.weights[0])
+		print "---------"
 		print output
