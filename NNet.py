@@ -63,7 +63,8 @@ class NeuralNetwork():
 		# print self.trainingInputs
 		# print self.trainingOutputs
 
+	# TODO: one input to hidden matrix, (amount) hidden to hidden, hidden to out matrix
 	def generateWeights(self):
-		for i in range(0,self.layers + 1):
+		for i in range(0,self.layers): # input
 			
 	
