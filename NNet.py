@@ -18,7 +18,6 @@ class NeuralNetwork():
 	layerNeuronCount = 0
 	outputs = 0
 	
-
 	# construction
 	def __init__(self,inpNum,hiddenLayerNum,hiddenLayerNeurons,outNum):
 		print "Network shape initialized: " + str(inpNum) + " inputs, " + str(hiddenLayerNum) + " hidden layers, " + str(hiddenLayerNeurons) + " neurons per hidden layer, " + str(outNum) + " outputs"
@@ -41,7 +40,6 @@ class NeuralNetwork():
 		self.feedForward = theano.function([mat_incoming, mat_weights], mat_outputs)
 
 		print "(Functions ready!)"
-
 
 	# expects csv file
 	def readTrainingData(self, fileName):
@@ -81,3 +79,5 @@ class NeuralNetwork():
 
 		for i in range(0, len(self.weights)):
 			print self.weights[i]
+
+	def runFeedForward(self):
