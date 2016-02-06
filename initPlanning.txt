@@ -1,0 +1,8 @@
+Initial Use:
+	Naive Bayes -- classifier 
+	Feedforward (MLP) -- classifier
+	k-Means -- clustering
+	Hierarchical -- clustering
+	Canonical Correlation -- dimensionality reduction
+	Linear Discriminant Analysis -- dimensionality reduction
+	

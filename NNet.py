@@ -20,7 +20,7 @@ class NeuralNetwork():
 	outputs = 0
 	
 	# construction
-	def __init__(self,inpNum,hiddenLayerNum,hiddenLayerNeurons,outNum):
+	def __init__(self, inpNum, hiddenLayerNum, hiddenLayerNeurons, outNum):
 		print "Network shape initialized: " + str(inpNum) + " inputs, " + str(hiddenLayerNum) + " hidden layers, " + str(hiddenLayerNeurons) + " neurons per hidden layer, " + str(outNum) + " outputs"
 		self.inputs = inpNum
 		self.layers = hiddenLayerNum
