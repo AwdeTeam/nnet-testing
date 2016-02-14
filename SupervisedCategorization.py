@@ -49,14 +49,18 @@ class Dataset():
 	bound = [-1, 1]
 	
 	def loadFromText(self, file, delim):
-		self.rawData = numpy.loadtxt(open(file,"rb"), delimiter=delim, skiprows=0, ndimin=2)
-		for t in range (0, colsInRawData)
-			categories[t] = categories[0][t]
-			
-		for i in range (1, rowsInRawData):
-			for j in range (0, colsInRawData):
-				normalData[i][j] = rawData[i][j]
+		#self.rawData = numpy.loadtxt(open(file,"rb"), delimiter=delim, skiprows=0, ndmin=2)
+		#self.rawData = numpy.loadtxt(open(file,"rb"), dtype=<type 'string'>, delimiter=delim, skiprows=0, ndmin=2)
+		self.rawData = numpy.genfromtxt(file, dtype=None, delimiter=delim, skiprows=0)
 		
-	def 
+		#for t in range (0, colsInRawData)
+			#categories[t] = categories[0][t]
+			
+		#for i in range (1, rowsInRawData):
+			#for j in range (0, colsInRawData):
+				#normalData[i][j] = rawData[i][j]
+		
+	def getRawData(self):
+		return self.rawData
 		
 print("nothing broken")
