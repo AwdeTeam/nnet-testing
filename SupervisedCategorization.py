@@ -59,6 +59,10 @@ class Dataset():
 		#for i in range (1, rowsInRawData):
 			#for j in range (0, colsInRawData):
 				#normalData[i][j] = rawData[i][j]
+
+	def normalizeData(self, column): # pass in a column of data and it will return normalized
+		
+		
 		
 	def getRawData(self):
 		return self.rawData
