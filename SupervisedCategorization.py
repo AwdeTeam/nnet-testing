@@ -1,8 +1,8 @@
-print("Running imports...")
+print("(Running imports...)")
 import numpy
 import sklearn
 #import metrics from sklearn
-print("Finished imports.")
+print("(Finished imports.)")
 
 class SupervisedClassifier():
 	
@@ -44,6 +44,10 @@ class Dataset():
 	#member variables
 	rawData = None #matrix of strings loaded directly from a dataset, top row is categories
 	normalData = None #normalized to passed specifications and uniform type (default to reals (internally 32-bit floating points) bounded by [-1, 1])
+
+	dataRows = 0
+	dataCols = 0
+	
 	categories = [] #keep track of the name of the categories
 	type = "real"
 	bound = [-1, 1]
@@ -52,6 +56,17 @@ class Dataset():
 		#self.rawData = numpy.loadtxt(open(file,"rb"), delimiter=delim, skiprows=0, ndmin=2)
 		#self.rawData = numpy.loadtxt(open(file,"rb"), dtype=<type 'string'>, delimiter=delim, skiprows=0, ndmin=2)
 		self.rawData = numpy.genfromtxt(file, dtype=None, delimiter=delim, skiprows=0)
+
+		# Get dimensions
+		self.dataRows = self.rawData.shape[0]
+		self.dataCols = self.rawData.shape[1]
+		
+		print ("DATA SIZE: " + str(self.dataRows) + " rows " + str(self.dataCols) + " cols")
+
+		print("(Normalizing...)")
+		self.normalData = numpy.empty_like(self.rawData)
+		self.normalizeData()
+		print("(Normalizing complete!)")
 		
 		#for t in range (0, colsInRawData)
 			#categories[t] = categories[0][t]
@@ -60,11 +75,20 @@ class Dataset():
 			#for j in range (0, colsInRawData):
 				#normalData[i][j] = rawData[i][j]
 
-	def normalizeData(self, column): # pass in a column of data and it will return normalized
-		
+	def normalizeData(self): # pass in a column of data and it will return normalized (should also auto assign to the normaldata thing) NOTE: don't actually return, just edit normalData!
+		for r in range(0, self.dataRows):
+			for c in range(0, self.dataCols):
+				self.normalData[r,c] = self.normalizeEntry(self.rawData[r,c])
+
+	def normalizeEntry(self, entry): # normalizes single thing (checks for data type, numberizes accordingly)
+		print("[normalizing " + str(entry) + "]")
+		return 1.0
 		
 		
 	def getRawData(self):
 		return self.rawData
+
+	def getNormalData(self):
+		return self.normalData
 		
-print("nothing broken")
+#print("nothing broken")

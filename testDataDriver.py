@@ -8,3 +8,6 @@ print("(Data loaded!)")
 
 dataMatrixRaw = thing.getRawData()
 print(dataMatrixRaw)
+
+dataMatrixNormal = thing.getNormalData()
+print(dataMatrixNormal)
