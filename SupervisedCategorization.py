@@ -82,6 +82,21 @@ class Dataset():
 
 	def normalizeEntry(self, entry): # normalizes single thing (checks for data type, numberizes accordingly)
 		print("[normalizing " + str(entry) + "]")
+		
+		# remove quotes
+		entry = entry.replace('"', '').strip()
+		print("[[now " + str(entry) + "]]")
+
+		# if number, make invert
+		if self.isNumber(entry):
+			print("[[is number]]")
+			entry = float(entry)
+			if entry == 0: # don't divide by zero!!! Python doesn't like it...
+				return 0
+			return (1 / entry)
+
+		# if string, do some magic
+		
 		return 1.0
 		
 		
@@ -90,5 +105,12 @@ class Dataset():
 
 	def getNormalData(self):
 		return self.normalData
+
+	def isNumber(self, num): # http://stackoverflow.com/questions/354038/how-do-i-check-if-a-string-is-a-number-float-in-python
+		try:
+			float(num)
+			return True
+		except ValueError:
+			return False
 		
 #print("nothing broken")
