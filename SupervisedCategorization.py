@@ -54,8 +54,6 @@ class Dataset():
 	bound = [-1, 1]
 	
 	def loadFromText(self, file, delim):
-		#self.rawData = numpy.loadtxt(open(file,"rb"), delimiter=delim, skiprows=0, ndmin=2)
-		#self.rawData = numpy.loadtxt(open(file,"rb"), dtype=<type 'string'>, delimiter=delim, skiprows=0, ndmin=2)
 		print("(Loading data...)")
 		self.rawData = numpy.genfromtxt(file, dtype=None, delimiter=delim)
 
@@ -70,23 +68,10 @@ class Dataset():
 		print("(Data loaded!)")
 		print ("DATA SIZE: " + str(self.dataRows) + " rows " + str(self.dataCols) + " cols")
 
-		
-		#for t in range (0, colsInRawData)
-			#categories[t] = categories[0][t]
-			
-		#for i in range (1, rowsInRawData):
-			#for j in range (0, colsInRawData):
-				#normalData[i][j] = rawData[i][j]
-
-	# normalization types: simple
 	def normalizeData(self): # pass in a column of data and it will return normalized (should also auto assign to the normaldata thing) NOTE: don't actually return, just edit normalData!
 	
 		print("(Normalizing...)")
 		self.normalData = numpy.empty_like(self.rawData)
-
-		#for r in range(0, self.dataRows):
-		#	for c in range(0, self.dataCols):
-		#		self.normalData[r,c] = self.normalizeEntry(self.rawData[r,c])
 
 		for c in range(0, self.dataCols):
 			self.normalData[:,c] = self.normalizeVar(self.rawData[:,c])
@@ -111,45 +96,16 @@ class Dataset():
 		# "cast" so numpy doesn't complain
 		row = row.astype(float)
 
-		# get mean
+		# numpy magic!!! 
 		rowSum = row.sum()
 		rowMean = row.mean()
 		sDev = row.std()
-		#rowMean = rowSum / self.dataRows
 		
-		# find standard deviation
-		#sDev = 0
-		#summedTerm = 0
-		#for i in range(0, self.dataRows):
-		#	summedTerm += (row[i] - rowMean)**2
-
-		#sDev = sqrt(summedTerm / self.dataRows)
-
 		# adjust all row values
 		for i in range(0, self.dataRows):
 			row[i] = (row[i] - rowMean) / sDev
 			
 		return row
-
-	def normalizeEntry(self, entry): # normalizes single thing (checks for data type, numberizes accordingly)
-		# print("[normalizing " + str(entry) + "]") # DEBUG
-		
-		# remove quotes
-		entry = entry.replace('"', '').strip()
-		# print("[[now " + str(entry) + "]]") # DEBUG
-
-		# if number, make invert
-		if self.isNumber(entry):
-			# print("[[is number]]") # DEBUG
-			entry = float(entry)
-			if entry == 0: # don't divide by zero!!! Python doesn't like it...
-				return 0
-			return (1 / entry)
-
-		# if string, do some magic
-		
-		return 1.0
-		
 		
 	def getRawData(self):
 		return self.rawData
