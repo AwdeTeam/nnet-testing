@@ -1,5 +1,6 @@
 print("(Running imports...)")
 import math
+import csv
 import numpy
 import sklearn
 #import metrics from sklearn
@@ -50,16 +51,19 @@ class Dataset():
 	dataCols = 0
 	
 	categories = [] #keep track of the name of the categories
-	type = "real"
-	bound = [-1, 1]
+	#type = "real"
+	#bound = [-1, 1] # NOTE: based on current method, not using hard limits of -1 and 1, rather using -mean / std method, which seems to be fairly conventional
 	
-	def loadFromText(self, file, delim):
+	def loadFromText(self, fileName, delim):
 		print("(Loading data...)")
-		self.rawData = numpy.genfromtxt(file, dtype=None, delimiter=delim)
+		self.rawData = numpy.genfromtxt(fileName, dtype=None, delimiter=delim)
+
+		# get categories
+		csv_reader = csv.reader(open(fileName), delimiter=delim, quotechar='"')
+		categories = csv_reader.next()
 
 		# remove header (already tried using skip_header in genfromtxt, but for some reason, shape variable doesn't work with that...)
 		self.rawData = numpy.delete(self.rawData, 0, 0)
-		
 
 		# Get dimensions
 		self.dataRows = self.rawData.shape[0]
@@ -67,8 +71,11 @@ class Dataset():
 		
 		print("(Data loaded!)")
 		print ("DATA SIZE: " + str(self.dataRows) + " rows " + str(self.dataCols) + " cols")
+		print ("Categories:")
+		for cat in categories:
+			print("\t" + cat)
 
-	def normalizeData(self): # pass in a column of data and it will return normalized (should also auto assign to the normaldata thing) NOTE: don't actually return, just edit normalData!
+	def normalizeData(self): # normalizes all cols (inputs) and stores it in normalData
 	
 		print("(Normalizing...)")
 		self.normalData = numpy.empty_like(self.rawData)
@@ -78,34 +85,44 @@ class Dataset():
 					
 		print("(Normalizing complete!)")
 		
-	# normalizes row of data (one input variable)
-	def normalizeVar(self, row):
+	# normalizes col of data (one input variable)
+	# TODO: string normalization is using a very unofficial method and should be worked on further!
+	def normalizeVar(self, rawCol):
+	
+		col = numpy.copy(rawCol) # make a copy of the data to play with
 	
 		# remove quotes
 		for i in range(0, self.dataRows):
-			row[i] = row[i].replace('"', '').strip()
+			col[i] = col[i].replace('"', '').strip()
 		
 		# check if num
-		sampleEntry = row[0]
-		print("checking col type with sample " + str(sampleEntry))
+		sampleEntry = col[0]
+		print("checking col type with sample " + str(sampleEntry)) # DEBUG
 		
 		if self.isNumber(sampleEntry) == False: # explicitly checking false cause idk how to do basic negation in python?? 
-			print("Normalizing string column")
-			return row # at some point, don't return, just turn strings into numbers
+			print("--NORMALIZING STRING COLUMN--") # DEBUG
+			
+			for i in range(0, self.dataRows):
+				# right now, just add up all ascii values of char strings
+				stringSum = 0
+				for j in range(0, len(col[i])):
+					stringSum += ord(col[i][j])
+
+				col[i] = stringSum
 
 		# "cast" so numpy doesn't complain
-		row = row.astype(float)
+		col = col.astype(float)
 
 		# numpy magic!!! 
-		rowSum = row.sum()
-		rowMean = row.mean()
-		sDev = row.std()
+		colSum = col.sum()
+		colMean = col.mean()
+		sDev = col.std()
 		
-		# adjust all row values
+		# adjust all col values
 		for i in range(0, self.dataRows):
-			row[i] = (row[i] - rowMean) / sDev
+			col[i] = (col[i] - colMean) / sDev
 			
-		return row
+		return col
 		
 	def getRawData(self):
 		return self.rawData
