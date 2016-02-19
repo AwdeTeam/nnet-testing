@@ -1,4 +1,5 @@
 print("(Running imports...)")
+import math
 import numpy
 import sklearn
 #import metrics from sklearn
@@ -55,18 +56,20 @@ class Dataset():
 	def loadFromText(self, file, delim):
 		#self.rawData = numpy.loadtxt(open(file,"rb"), delimiter=delim, skiprows=0, ndmin=2)
 		#self.rawData = numpy.loadtxt(open(file,"rb"), dtype=<type 'string'>, delimiter=delim, skiprows=0, ndmin=2)
-		self.rawData = numpy.genfromtxt(file, dtype=None, delimiter=delim, skiprows=0)
+		print("(Loading data...)")
+		self.rawData = numpy.genfromtxt(file, dtype=None, delimiter=delim)
+
+		# remove header (already tried using skip_header in genfromtxt, but for some reason, shape variable doesn't work with that...)
+		self.rawData = numpy.delete(self.rawData, 0, 0)
+		
 
 		# Get dimensions
 		self.dataRows = self.rawData.shape[0]
 		self.dataCols = self.rawData.shape[1]
 		
+		print("(Data loaded!)")
 		print ("DATA SIZE: " + str(self.dataRows) + " rows " + str(self.dataCols) + " cols")
 
-		print("(Normalizing...)")
-		self.normalData = numpy.empty_like(self.rawData)
-		self.normalizeData()
-		print("(Normalizing complete!)")
 		
 		#for t in range (0, colsInRawData)
 			#categories[t] = categories[0][t]
@@ -75,21 +78,69 @@ class Dataset():
 			#for j in range (0, colsInRawData):
 				#normalData[i][j] = rawData[i][j]
 
+	# normalization types: simple
 	def normalizeData(self): # pass in a column of data and it will return normalized (should also auto assign to the normaldata thing) NOTE: don't actually return, just edit normalData!
-		for r in range(0, self.dataRows):
-			for c in range(0, self.dataCols):
-				self.normalData[r,c] = self.normalizeEntry(self.rawData[r,c])
+	
+		print("(Normalizing...)")
+		self.normalData = numpy.empty_like(self.rawData)
+
+		#for r in range(0, self.dataRows):
+		#	for c in range(0, self.dataCols):
+		#		self.normalData[r,c] = self.normalizeEntry(self.rawData[r,c])
+
+		for c in range(0, self.dataCols):
+			self.normalData[:,c] = self.normalizeVar(self.rawData[:,c])
+					
+		print("(Normalizing complete!)")
+		
+	# normalizes row of data (one input variable)
+	def normalizeVar(self, row):
+	
+		# remove quotes
+		for i in range(0, self.dataRows):
+			row[i] = row[i].replace('"', '').strip()
+		
+		# check if num
+		sampleEntry = row[0]
+		print("checking col type with sample " + str(sampleEntry))
+		
+		if self.isNumber(sampleEntry) == False: # explicitly checking false cause idk how to do basic negation in python?? 
+			print("Normalizing string column")
+			return row # at some point, don't return, just turn strings into numbers
+
+		# "cast" so numpy doesn't complain
+		row = row.astype(float)
+
+		# get mean
+		rowSum = row.sum()
+		rowMean = row.mean()
+		sDev = row.std()
+		#rowMean = rowSum / self.dataRows
+		
+		# find standard deviation
+		#sDev = 0
+		#summedTerm = 0
+		#for i in range(0, self.dataRows):
+		#	summedTerm += (row[i] - rowMean)**2
+
+		#sDev = sqrt(summedTerm / self.dataRows)
+
+		# adjust all row values
+		for i in range(0, self.dataRows):
+			row[i] = (row[i] - rowMean) / sDev
+			
+		return row
 
 	def normalizeEntry(self, entry): # normalizes single thing (checks for data type, numberizes accordingly)
-		print("[normalizing " + str(entry) + "]")
+		# print("[normalizing " + str(entry) + "]") # DEBUG
 		
 		# remove quotes
 		entry = entry.replace('"', '').strip()
-		print("[[now " + str(entry) + "]]")
+		# print("[[now " + str(entry) + "]]") # DEBUG
 
 		# if number, make invert
 		if self.isNumber(entry):
-			print("[[is number]]")
+			# print("[[is number]]") # DEBUG
 			entry = float(entry)
 			if entry == 0: # don't divide by zero!!! Python doesn't like it...
 				return 0

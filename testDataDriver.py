@@ -1,13 +1,12 @@
 import SupervisedCategorization as sc
 
-thing = sc.Dataset()
+data = sc.Dataset()
 
-print("(Loading data...)")
-thing.loadFromText("TestData/student-mat.csv", ";")
-print("(Data loaded!)")
+data.loadFromText("TestData/student-mat.csv", ";")
+data.normalizeData()
 
-dataMatrixRaw = thing.getRawData()
+dataMatrixRaw = data.getRawData()
 print(dataMatrixRaw)
 
-dataMatrixNormal = thing.getNormalData()
+dataMatrixNormal = data.getNormalData()
 print(dataMatrixNormal)
