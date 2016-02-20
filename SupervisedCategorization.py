@@ -93,7 +93,7 @@ class Dataset():
 	
 		# remove quotes
 		for i in range(0, self.dataRows):
-			col[i] = col[i].replace('"', '').strip()
+			col[i] = col[i].replace('"', '').strip() # TODO: escaped quotes are allowed!
 		
 		# check if num
 		sampleEntry = col[0]
