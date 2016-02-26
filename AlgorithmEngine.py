@@ -3,8 +3,42 @@ import math
 import csv
 import numpy
 import sklearn
+from sklearn.naive_bayes import GaussianNB
+import joblib #THIS COULD BE VERY INSECURE, CHECK WITH SOMEONE WHO ACTUALLY KNOWS WHAT THEY'RE TALKING ABOUT!
 #import metrics from sklearn
 print("(Finished imports.)")
+
+class Sharable():
+	#member variables
+	algorithm = None #the trained algorithm object
+	name = ""
+	version = ""
+	statistics = None #this will probably be an sklearn helper class. We might want to wrap it up with other stuff also
+	computation = None #we might have to implement this in numpy
+	client_history = None #client-side provenance
+	usage = None #input and output types, along with usage intentions
+	
+	def __init__(self, algorithm, name, version, statistics, computation, client_history, usage):
+		self.algorithm = algorithm
+		self.name = name
+		self.version = version
+		self.statistics = statistics
+		self.client_history = client_history
+		self.usage = usage
+		
+	def saveState(self, path):
+		joblib.dump(self, path + name + "_" + version + ".saf", compress=2, cache_size=100, protocol=None)
+		
+	def loadState(file): #verify upstream that this is a .saf, not a .paf
+		return joblib.load(file)
+		
+	def exportPAF(self, path):
+		#some sort of hashing thing to allow the ability to verify integrity
+		joblib.dump(self, path + name + "_" + version + ".paf", compress=9, cache_size=100, protocol=None)
+
+	def importPAF(self, path):
+		#some sort of hash verification to ensure this is the expected thing
+		return joblib.load(file)
 
 class SupervisedClassifier():
 	
@@ -12,7 +46,7 @@ class SupervisedClassifier():
 	A = None #root algorithm
 	ID = "FF-00" #no algorithm set
 	
-	def _init_(self, id):
+	def __init__(self, id): #right... *two* underscores
 		if("naive_bayes" or id == "00-00"):
 			self.A = GaussianNB()
 			self.ID = "00-00"
@@ -24,28 +58,34 @@ class SupervisedClassifier():
 		return self.A.predict(set)
 
 		
-	def fit(self, set, exp, ratio):
+	def fit(self, set, exp, ratio=0.1):
 		point = int((1-ratio)*len(exp))
 		target = exp[:point]
 		tmp = self.A.fit(set[:point], target)
 		
 		return metrics.accuracy_score(exp[point:], tmp.predict[set:], normalize=True, sample_weight=None)
 	
-	def fit(self, set, exp):
-		return fit(self, set, exp, 0.1) #reserve 10% of the dataset for accuracy test by default
+	#def fit(self, set, exp):
+	#	return fit(self, set, exp, 0.1) #reserve 10% of the dataset for accuracy test by default
 		
-	def metafit(self, I, set, exp, ratio): #yes, I know this could be handled upstream, but I think it fits better here
+	def metafit(self, I, set, exp, ratio=0.1): #yes, I know this could be handled upstream, but I think it fits better here
 		return fit(self, I.predict(I, set), exp, ratio)
 		
-	def metafit(self, I, set, exp):
-		return fit(self, I.predict(I, set), exp)
+	#def metafit(self, I, set, exp):
+	#	return fit(self, I.predict(I, set), exp)
 		
+class Datatype():
+	# can be Null, Boolean, Integer, BoundedReal, Real, Complex, String, Image, or Aggregate
+    name = "unnamed";
+    rank = -1;
+    #private Datatype[] bundle = null;
 		
 class Dataset():
 
 	#member variables
 	rawData = None #matrix of strings loaded directly from a dataset, top row is categories
 	normalData = None #normalized to passed specifications and uniform type (default to reals (internally 32-bit floating points) bounded by [-1, 1])
+	datatype = None #datatype of the set TODO make this work
 
 	dataRows = 0
 	dataCols = 0
@@ -54,14 +94,40 @@ class Dataset():
 	#type = "real"
 	#bound = [-1, 1] # NOTE: based on current method, not using hard limits of -1 and 1, rather using -mean / std method, which seems to be fairly conventional
 	
+	def indexColumn(self, dex, normalized=False):
+		return self.getRawData[:, dex]
+	
+	def getColumn(self, name, normalized=False):
+		dex = -1
+		#print(self.getRawData)
+		for i in range(0, len(self.categories)):
+			if(name == self.categories[i]):
+				dex = i
+				break
+		if(dex == -1):
+			return None
+		
+		return self.getRawData()[:,dex]
+	
+	def excludeColumn(self, name, normalized=False):
+		dex = -1
+		ref = self.getNormalData() if normalized else self.getRawData()
+		print(str(type(ref)) + "\n" + str(ref) + "\nRows: " + str(len(ref)) + "\tCols: " + str(len(ref[0])))
+		r = numpy.array([len(ref) - 1, len(ref[0])])
+		for i in range(0, len(self.categories)):
+			if(name != self.categories[i]):
+				dex = i
+		ref = numpy.delete(ref, (dex), axis=1)
+		print(str(type(ref)) + "\n" + str(ref) + "\nRows: " + str(len(ref)) + "\tCols: " + str(len(ref[0])))
+		return ref
+	
 	def loadFromText(self, fileName, delim):
 		print("(Loading data...)")
 		self.rawData = numpy.genfromtxt(fileName, dtype=None, delimiter=delim)
 
 		# get categories
 		csv_reader = csv.reader(open(fileName), delimiter=delim, quotechar='"')
-		categories = csv_reader.next()
-
+		self.categories = csv_reader.next()
 		# remove header (already tried using skip_header in genfromtxt, but for some reason, shape variable doesn't work with that...)
 		self.rawData = numpy.delete(self.rawData, 0, 0)
 
@@ -70,9 +136,9 @@ class Dataset():
 		self.dataCols = self.rawData.shape[1]
 		
 		print("(Data loaded!)")
-		print ("DATA SIZE: " + str(self.dataRows) + " rows " + str(self.dataCols) + " cols")
-		print ("Categories:")
-		for cat in categories:
+		print("DATA SIZE: " + str(self.dataRows) + " rows " + str(self.dataCols) + " cols")
+		print("Categories:")
+		for cat in self.categories:
 			print("\t" + cat)
 
 	def normalizeData(self): # normalizes all cols (inputs) and stores it in normalData
@@ -82,7 +148,7 @@ class Dataset():
 
 		for c in range(0, self.dataCols):
 			self.normalData[:,c] = self.normalizeVar(self.rawData[:,c])
-					
+
 		print("(Normalizing complete!)")
 		
 	# normalizes col of data (one input variable)
@@ -136,5 +202,19 @@ class Dataset():
 			return True
 		except ValueError:
 			return False
+			
+print("Starting Engine Test")
+inputs = Dataset()
+inputs.loadFromText(".\\TestData\\student-mat.csv", ";")
+print("Data successfully loaded\nCreating Algorithm")
+algorithm = SupervisedClassifier("00-00")
+print("Algorithm successfully built")
+S = inputs.getColumn("internet")
+#print("Column " + str(S))
+T = inputs.excludeColumn("internet")
+print("Column " + str(T))
+print("Training Algorithm")
+metrics = algorithm.fit(T, S)
+print("Algorithm trained")
 		
 #print("nothing broken")
