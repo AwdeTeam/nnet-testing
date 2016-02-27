@@ -107,7 +107,7 @@ class Dataset():
 		if(dex == -1):
 			return None
 		
-		return self.getRawData()[:,dex]
+		return self.getNormalData()[:,dex] if normalized else self.getRawData()[:,dex]
 	
 	def excludeColumn(self, name, normalized=False):
 		dex = -1
@@ -206,12 +206,17 @@ class Dataset():
 print("Starting Engine Test")
 inputs = Dataset()
 inputs.loadFromText(".\\TestData\\student-mat.csv", ";")
+inputs.normalizeData()
+type = Datatype()
+type.name = "Student Data"
+type.rank = inputs.dataCols
+inputs.datatype = type
 print("Data successfully loaded\nCreating Algorithm")
 algorithm = SupervisedClassifier("00-00")
 print("Algorithm successfully built")
-S = inputs.getColumn("internet")
+S = inputs.getColumn("internet", True)
 #print("Column " + str(S))
-T = inputs.excludeColumn("internet")
+T = inputs.excludeColumn("internet", True)
 print("Column " + str(T))
 print("Training Algorithm")
 metrics = algorithm.fit(T, S)
