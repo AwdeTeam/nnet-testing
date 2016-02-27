@@ -4,6 +4,8 @@ import csv
 import numpy
 import sklearn
 from sklearn.naive_bayes import GaussianNB
+from sklearn import linear_model
+from sklearn import metrics
 import joblib #THIS COULD BE VERY INSECURE, CHECK WITH SOMEONE WHO ACTUALLY KNOWS WHAT THEY'RE TALKING ABOUT!
 #import metrics from sklearn
 print("(Finished imports.)")
@@ -47,28 +49,27 @@ class SupervisedClassifier():
 	ID = "FF-00" #no algorithm set
 	
 	def __init__(self, id): #right... *two* underscores
-		if("naive_bayes" or id == "00-00"):
+		if(id == "naive_bayes" or id == "00-00"):
 			self.A = GaussianNB()
 			self.ID = "00-00"
 		elif(id == "feed_forward" or id == "00-01"):
 			self.A = MLPClassifier(algorithm='l-bfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1) #gonna need a way to pass in arguments at some point
 			self.ID = "00-01"
+		elif(id == "LinearRegression" or id == "00-02"):
+			self.A = linear_model.LinearRegression()
+			self.ID = "00-02"
 	
 	def predict(self, set):
 		return self.A.predict(set)
 
 		
-	def fit(self, set, exp, ratio=0.1):
-		point = int((1-ratio)*len(exp))
-		target = exp[:point]
-		tmp = self.A.fit(set[:point], target)
-		
-		return metrics.accuracy_score(exp[point:], tmp.predict[set:], normalize=True, sample_weight=None)
+	def fit(self, set, exp):
+		return self.A.fit(set, exp)
 	
 	#def fit(self, set, exp):
 	#	return fit(self, set, exp, 0.1) #reserve 10% of the dataset for accuracy test by default
 		
-	def metafit(self, I, set, exp, ratio=0.1): #yes, I know this could be handled upstream, but I think it fits better here
+	def metafit(self, I, set, exp, ratio=0.1): #yes, I know this could be handled upstream, but I think it fits better here NO. no no no no no no, this is dumb
 		return fit(self, I.predict(I, set), exp, ratio)
 		
 	#def metafit(self, I, set, exp):
@@ -112,13 +113,13 @@ class Dataset():
 	def excludeColumn(self, name, normalized=False):
 		dex = -1
 		ref = self.getNormalData() if normalized else self.getRawData()
-		print(str(type(ref)) + "\n" + str(ref) + "\nRows: " + str(len(ref)) + "\tCols: " + str(len(ref[0])))
+		print(str(ref) + "\n" + str(ref) + "\nRows: " + str(len(ref)) + "\tCols: " + str(len(ref[0])))
 		r = numpy.array([len(ref) - 1, len(ref[0])])
 		for i in range(0, len(self.categories)):
 			if(name != self.categories[i]):
 				dex = i
 		ref = numpy.delete(ref, (dex), axis=1)
-		print(str(type(ref)) + "\n" + str(ref) + "\nRows: " + str(len(ref)) + "\tCols: " + str(len(ref[0])))
+		print(str(ref) + "\n" + str(ref) + "\nRows: " + str(len(ref)) + "\tCols: " + str(len(ref[0])))
 		return ref
 	
 	def loadFromText(self, fileName, delim):
@@ -202,24 +203,38 @@ class Dataset():
 			return True
 		except ValueError:
 			return False
-			
+		
 print("Starting Engine Test")
+sampleCol = "freetime"
 inputs = Dataset()
 inputs.loadFromText(".\\TestData\\student-mat.csv", ";")
 inputs.normalizeData()
-type = Datatype()
-type.name = "Student Data"
-type.rank = inputs.dataCols
-inputs.datatype = type
+infotype = Datatype()
+infotype.name = "Student Data"
+infotype.rank = inputs.dataCols
+inputs.datatype = infotype
+
+testin = Dataset()
+testin.loadFromText(".\\TestData\\student-por.csv", ";")
+testin.normalizeData()
+testin.datatype = infotype
+
 print("Data successfully loaded\nCreating Algorithm")
-algorithm = SupervisedClassifier("00-00")
+algorithm = SupervisedClassifier("00-02")
 print("Algorithm successfully built")
-S = inputs.getColumn("internet", True)
+S = numpy.asarray(inputs.getColumn(sampleCol, True), dtype="float_")
 #print("Column " + str(S))
-T = inputs.excludeColumn("internet", True)
+T = numpy.asarray(inputs.excludeColumn(sampleCol, True), dtype="float_")
 print("Column " + str(T))
 print("Training Algorithm")
-metrics = algorithm.fit(T, S)
+#lin = linear_model.LinearRegression()
+
+algorithm = algorithm.fit(T, S)
 print("Algorithm trained")
-		
+#print(algorithm.predict(T))
+print(algorithm.score(T, S))
+print("Testing extends")
+S1 = numpy.asarray(testin.getColumn(sampleCol, True), dtype="float_")
+T1 = numpy.asarray(testin.excludeColumn(sampleCol, True), dtype="float_")
+print(algorithm.score(T1, S1))
 #print("nothing broken")
